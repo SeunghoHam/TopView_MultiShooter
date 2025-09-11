@@ -14,6 +14,8 @@ class UAnimationControlComponent;
 class ACommandCenter;
 class UEnemyAnimInstance;
 class UHealthComponent;
+
+//class UAnimMontage;
 struct FTimerHandle;
 UCLASS()
 class WASDL_API ABaseEnemy : public ABaseCharacter
@@ -42,37 +44,43 @@ public:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UEnemyAnimInstance* AnimInstance = nullptr;
+
+	//UPROPERTY(EditAnywhere,BlueprintReadWrite, Category=Setting)
+	//TObjectPtr<UAnimMontage> AttackMontage;
 	
-	UPROPERTY()
-	TArray<AActor*> CommandCenter;
+	//UPROPERTY()
+	//TArray<AActor*> CommandCenter;
 	
-	UPROPERTY()
-	ACommandCenter* CommandCenterInstance;
+	//UPROPERTY()
+	//ACommandCenter* CommandCenterInstance;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetTargetLocation();
-
+	
+		
 	virtual void OnRep_AttackRotation() override;
 	//UFUNCTION(BlueprintCallable, BlueprintPure)
 	//AActor* GetTarget();
 
 	//UFUNCTION(BlueprintCallable, BlueprintPure)
 	//bool GetIsTargetNear();
-
+	
 	
 	//UFUNCTION(BlueprintCallable)
 	//FVector GetTargetLocation(); // BTT 에서 이 함수 받아올거임
 
 	//UPROPERTY(Replicated)
 	//AActor* CurrentTarget = nullptr; // 커맨드 센터가 아닌 타겟
-	
+
+	virtual bool GetIsTargetNear() override;
 	
 	UFUNCTION(BlueprintCallable)
 	void TryAttack(); // BTT에서 공격 실행
 	
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackMotionEffect(FVector _dir);
-	
+
+
 
 	// 공격 모션 만들기
 	void AttackPreset();
@@ -85,7 +93,7 @@ public:
 	UPROPERTY(Replicated)
 	FVector Acurrent = FVector::ZeroVector;
 	UPROPERTY(Replicated)
-	FRotator ARcurrent = FRotator::ZeroRotator;
+	FQuat ARcurrent = FQuat::Identity;
 	bool bAttacking = false;
 	bool bAttackPart = true;
 	float DurationTime = 0.f;
@@ -94,7 +102,7 @@ public:
 	
 	AActor* TraceArond(float _radius);
 	//AActor* FindNearestEnemy_Registry(FName _tag ,float MaxRadius);
-
+	
 	FVector AttackDir;
 
 	//float MaxHP;

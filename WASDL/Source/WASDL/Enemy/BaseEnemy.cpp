@@ -54,7 +54,7 @@ void ABaseEnemy::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Red, TEXT("[Enemy] Widget is null"));
 	}
 
-	
+	/*
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("CommandCenter"), CommandCenter);
 	//GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Yellow,
 	 //                                FString::Printf(TEXT("CommandCenterCount : %d"), CommandCenter.Num()));
@@ -68,8 +68,9 @@ void ABaseEnemy::BeginPlay()
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Red, TEXT("Fail Get CommandCenter"));
-	}
-
+	}*/
+	
+	AnimInstance = Cast<UEnemyAnimInstance>( GetMesh()->GetAnimInstance());
 	TargetTag = "PlayerTeam";
 	FindRadius = 300.f;
 	GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, this, &ABaseEnemy::TryRegister, 0.3f, false);
@@ -91,10 +92,6 @@ void ABaseEnemy::Tick(float DeltaTime)
 	{
 		AttackDir = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 		
-		//FRotator rot= AttackDir.Rotation();
-		//float yawOnly = rot.Yaw;
-		//GetMesh()->SetWorldRotation(yawOnly);
-		//GetMesh()->SetWorldRotation(FRotator(0.f, yawOnly, 0.f));
 	}
 	
 	if (bAttacking)
@@ -118,7 +115,8 @@ void ABaseEnemy::Tick(float DeltaTime)
 				bAttacking =false;
 			}
 		}
-		ARcurrent = FMath::Lerp(ARstart,ARend,DurationTime/AttackTime);
+		//ARcurrent = FMath::Lerp(ARstart,ARend,DurationTime/AttackTime);
+		ARcurrent = FQuat::Slerp(ARstart.Quaternion(),ARend.Quaternion(), DurationTime/AttackTime);
 		Acurrent =  FMath::Lerp(Astart, Aend, DurationTime / AttackTime);
 		SetActorLocation(Acurrent);
 		//SetActorRotation(ARcurrent);
@@ -138,6 +136,8 @@ void ABaseEnemy::TaskAttackEnd()
 
 void ABaseEnemy::HandleDeath()
 {
+	Super::HandleDeath();
+	
 	if (HasAuthority())
 	{
 		Multicast_OnDeath();
@@ -174,14 +174,13 @@ void ABaseEnemy::Server_OnDeath()
 
 void ABaseEnemy::Multicast_OnDeath()
 {
-	Super::Multicast_OnDeath();
+	//Super::Multicast_OnDeath();
 	SoundComponent->PlayAtLocation(ESoundName::effect_ZugglingDead, GetActorLocation());
 	GetCharacterMovement()->DisableMovement();
 	SetActorEnableCollision(false);
 	// 필요 시 Ragdoll: GetMesh()->SetSimulatePhysics(true);
-	SetLifeSpan(0.5f);
-	AnimInstance->SetAnimType(EAnimType::Death);
-	
+	SetLifeSpan(1.5f);
+	if (AnimInstance) AnimInstance->SetAnimType(EAnimType::Death);
 }
 
 void ABaseEnemy::TryRegister()
@@ -220,30 +219,36 @@ FVector ABaseEnemy::GetTargetLocation()
 	if (!CommandCenterInstance) 
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red,TEXT("TargetLocation is Zero"));
-		return FindNearestEnemy_Registry(FLT_MAX)->GetActorLocation();
-	}
-	*/
-
+		return FindNearestTarget_Registry(TargetTag, FLT_MAX)->GetActorLocation();
+	}*/
 	//GEngine->AddOnScreenDebugMessage(-1, 1.0f,FColor::Yellow,
 	//	FString::Printf(TEXT("CommandCenter : %s"), *CommandCenterInstance->GetName()));
 	//AnimInstance->SetAnimType(EAnimType::Walk);
-	AActor* NextTarget = FindNearestEnemy_Registry("PlayerTeam",FLT_MAX);
+	AActor* NextTarget = FindNearestTarget_Registry(TargetTag,FLT_MAX);
+	
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f,FColor::Yellow,
 	//	FString::Printf(TEXT("NextTarget : %s"), *NextTarget->GetName()));
 	if (NextTarget)
 	{
+		//DrawDebugSphere(GetWorld(),NextTarget->GetActorLocation(),32.0f, 16, FColor::Green,false ,1.0f);
 		return NextTarget->GetActorLocation();
 	}
 	else
 	{
+		//DrawDebugSphere(GetWorld(),NextTarget->GetActorLocation(),32.0f, 16, FColor::White,false ,1.0f);
+		
 		return GetActorLocation() + (GetActorForwardVector() * 100.f);
 	}
 }
 
 void ABaseEnemy::OnRep_AttackRotation()
 {
-	//Super::OnRep_AttackRotation();
-	SetActorRotation(AttackRotation);
+	//SetActorRotation(AttackRotation);
+}
+
+bool ABaseEnemy::GetIsTargetNear()
+{
+	return Super::GetIsTargetNear();
 }
 
 /*
@@ -261,8 +266,19 @@ bool ABaseEnemy::GetIsTargetNear()
 */
 void ABaseEnemy::TryAttack()
 {
+	//AnimInstance->SetAnimType(:attack)
 	if (CurrentTarget)
 	{
+		//if (AttackMontage) PlayAnimMontage(AttackMontage);
+		AnimInstance->SetAnimType(EAnimType::Attack);
+		TWeakObjectPtr<ABaseEnemy> WeakThis(this);
+		FTimerHandle timeHandle;
+		GetWorld()->GetTimerManager().SetTimer(timeHandle, [WeakThis, this]()
+		{
+			if (!WeakThis.IsValid()) return;
+			if (!HealthComponent->IsDead()) AnimInstance->SetAnimType(EAnimType::Idle);
+		}, 0.3f, false);
+	
 		DrawDebugLine(GetWorld(),
 			GetActorLocation(),
 			CurrentTarget->GetActorLocation(),
@@ -273,9 +289,10 @@ void ABaseEnemy::TryAttack()
 		if (HasAuthority()) // 데미지 계산은 서버에서만
 		{
 			//AttackRotation = AttackDir.Rotation();
-			
-			FRotator newRot = FRotator(0, AttackDir.Rotation().Yaw, 0);
-			AttackRotation = newRot.Quaternion();
+
+			// 변경 
+			//FRotator newRot = FRotator(0, AttackDir.Rotation().Yaw, 0);
+			//AttackRotation = newRot.Quaternion();
 			//SetActorRotation(quat);
 
 			

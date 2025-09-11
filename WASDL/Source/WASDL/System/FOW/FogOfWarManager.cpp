@@ -33,9 +33,9 @@ void AFogOfWarManager::BeginPlay()
 		param.Owner= this;
 		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		BrushActor =  GetWorld()->SpawnActor<AActor>(BrushActorClass, FVector::ZeroVector, FRotator::ZeroRotator, param);
-		OverlayActor =	GetWorld( )->SpawnActor<AActor>(OverlayActorClass, FVector::ZeroVector, FRotator::ZeroRotator, param);
+		//OverlayActor =	GetWorld( )->SpawnActor<AActor>(OverlayActorClass, FVector::ZeroVector, FRotator::ZeroRotator, param);
 	}
-
+/*
 	FogRT = UCanvasRenderTarget2D::CreateCanvasRenderTarget2D(GetWorld(), UCanvasRenderTarget2D::StaticClass(),
 	                                                          FogRTSize.X, FogRTSize.Y);
 	FogRT->bForceLinearGamma = true;
@@ -55,8 +55,7 @@ void AFogOfWarManager::BeginPlay()
 				BrushMID->SetScalarParameterValue(PARAM_Intensity, 1.0f);
 				//BrushMID->SetVectorParameterValue("CenterUV", FLinearColor(0.5f, 0.5f, 0, 0));
 				//BrushMID->SetScalarParameterValue("Radius", 0.12f);
-				//BrushMID->SetScalarParameterValue("Feather",0.024f);
-				//UpdateFog();
+				//BrushMID->SetScalarParameterValue("Feather",0.024f)
 				
 				UE_LOG(LogTemp, Warning, TEXT("BrushMat : %s"), *brushMat->GetName());
 				UE_LOG(LogTemp, Warning, TEXT("BrushMID : %s"), *BrushMID->GetName());
@@ -85,17 +84,6 @@ void AFogOfWarManager::BeginPlay()
 		
 		if (UStaticMeshComponent* Mesh = OverlayActor->FindComponentByClass<UStaticMeshComponent>())
 		{
-			/*
-			const FVector Center((WorldMin.X+WorldMax.X)*0.5f, (WorldMin.Y+WorldMax.Y)*0.5f, 100.f);
-			const float SX = (WorldMax.X - WorldMin.X) / 100.f; // BasicShapes/Plane 기준
-			const float SY = (WorldMax.Y - WorldMin.Y) / 100.f;
-
-			Mesh->SetWorldLocation(Center);
-			//Mesh->SetWorldRotation(FRotator(0.f, 0.f, 0.f)); // XY 평면 덮기
-			Mesh->SetWorldScale3D(FVector(SX, SY, 1.f));
-			Mesh->SetTranslucentSortPriority(2000);
-			Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			*/
 			if (UMaterialInterface* BaseMat = Mesh->GetMaterial(0)) // 엑터를 할당받지만 생성은 안하고, 가져오는 용도로 씀
 			{
 				OverlayMID = UMaterialInstanceDynamic::Create(BaseMat, this);
@@ -119,7 +107,7 @@ void AFogOfWarManager::BeginPlay()
 			}
 		}
 	}
-
+*/
 	// 간격 갱신 0.1s (10Hz)
 	//GetWorldTimerManager().SetTimer(TickHandle, this, &AFogOfWarManager::UpdateFog, 0.1f, true);
 

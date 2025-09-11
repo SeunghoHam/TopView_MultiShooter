@@ -1,0 +1,17 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\soundcomponent.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\x64\\wasdleditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\wasdl\\definitions.wasdl.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\source\\wasdl\\character\\components\\soundcomponent.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\soundcomponent.generated.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\source\\wasdl\\system\\audio\\audiomanagersubsystem.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\audiomanagersubsystem.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

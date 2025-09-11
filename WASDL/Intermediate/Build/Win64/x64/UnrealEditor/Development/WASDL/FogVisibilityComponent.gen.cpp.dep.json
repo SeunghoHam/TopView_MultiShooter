@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\fogvisibilitycomponent.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\x64\\wasdleditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\wasdl\\definitions.wasdl.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\source\\wasdl\\system\\fow\\fogvisibilitycomponent.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\fogvisibilitycomponent.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

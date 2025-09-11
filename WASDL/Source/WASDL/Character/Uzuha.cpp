@@ -137,16 +137,8 @@ void AUzuha::BeginPlay()
 	SetAttackModeLook(false);
 	AnimInstance = Cast<UUzuhaAnimInstance>(GetMesh()->GetAnimInstance());
 	
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("CommandCenter"), CommandCenter);
 
-	if (CommandCenter.Num() != 0)
-	{
-		CommandCenterInstance = Cast<ACommandCenter>(CommandCenter.IsValidIndex(0) ? CommandCenter[0] : nullptr);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Red, TEXT("Fail Get CommandCenter"));
-	}
+	
 	HealthComponent->HealthInitialize(120.0f);
 	GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, this, &AUzuha::RegisterRevealer, 0.3, false);
 	//GetWorld()->GetTimerManager().SetTimer(ListWidgetTimer, this, &AUzuha::ListWidgetInit, 1.0f, false);
@@ -163,16 +155,15 @@ void AUzuha::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLife
 float AUzuha::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	const float Applied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (!HasAuthority() || HealthComponent->bIsDead) return 0.0f;
 	
 	const float OldHP = HealthComponent->CurrentHP;
 
-	HealthComponent->CurrentHP = FMath::Clamp(HealthComponent->CurrentHP - FMath::Max(0.f, DamageAmount),
+	HealthComponent->CurrentHP = FMath::Clamp(HealthComponent->CurrentHP - DamageAmount, //FMath::Max(0.f, DamageAmount),
 							 0.f,
 							 HealthComponent->MaxHP);
 
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("GetDamaged : %f"), HealthComponent->CurrentHP));
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("GetDamaged : %f"), HealthComponent->CurrentHP));
 
 	ATeamPlayerState* PS = GetPlayerState<ATeamPlayerState>();
 	if (PS)
@@ -187,7 +178,7 @@ float AUzuha::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		HandleDeath(); // 서버에서만 실행되게
 		//MultiCast_OnDeath(); // FX 애니메이션 브로드캐스트
 	}
-	return OldHP - HealthComponent->CurrentHP;
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void AUzuha::PossessedBy(AController* NewController)
@@ -389,42 +380,6 @@ void AUzuha::DoAttackTrace_Server(const FVector& ShootDir)
 			this,
 			UDamageType::StaticClass()
 			);
-	
-	/*
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(AttackTrace), false, this);
-	Params.AddIgnoredActor(this);
-	if (Controller && Controller->GetPawn()) Params.AddIgnoredActor(Controller->GetPawn());
-
-	FHitResult Hit;
-	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params))
-	{
-		DrawDebugLine(GetWorld(), Start, End, FColor::White, false, 0.4f, 0, 2.0f);
-		
-		if (AActor* Enemy = (Hit.GetActor()))
-		{
-			// ✅ 서버 권한에서 데미지 적용
-			//Enemy->GetDamaged(10.0f);
-			UGameplayStatics::ApplyPointDamage(
-				Enemy,
-				10.f,
-				ShootDir,
-				Hit,
-				Controller,
-				this,
-				UDamageType::StaticClass()
-				);
-
-			// (선택) 모든 클라에 피격 이펙트
-			//Multicast_OnHitFX(Hit.ImpactPoint); // 이펙트 브로드캐스트
-		}
-	}
-	else
-	{
-		{
-			// 디버그 라인(서버에서만)
-			DrawDebugLine(GetWorld(), Start, End, FColor::White, false, 0.4f, 0, 2.0f);
-		}
-	}*/
 }
 
 void AUzuha::SpawnPing()//FVector Location)
@@ -623,8 +578,6 @@ void AUzuha::RM_Press()
 	SetAttackModeLook(true);
 	CursorWidget->ChangeCursorIcon(ECursorType::Attack);
 	PlayerState = EPlayerState::Attack;
-
-	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White,TEXT("RM Press"));
 }
 
 void AUzuha::RM_Release()
@@ -677,19 +630,6 @@ void AUzuha::DestroyOrderWidget(bool _isClick)
 	if(_isClick)
 	{
 		TrySpawnTank();
-		//SpawnPing();
-		/*
-		if (HasAuthority())
-		{
-			//DoSpawnTank_Server(SpawnLocation);
-			//Server_SpawnPing(SpawnLocation);
-			
-		}
-		else
-		{
-			Server_SpawnPing(SpawnLocation);
-			//Server_TryTankSpawn(SpawnLocation);
-		}*/
 	}
 }
 
@@ -789,7 +729,7 @@ void AUzuha::EnsureLocalUI()
 					HealthComponent->HPBarWidgetInstance = EH->GetBar();            // ✅ 바 포인터 연결
 					//HealthComponent->HPBarWidgetInstance->
 					HealthComponent->UpdateHealthUI();                             // 초기 값 갱신
-					HealthWidget->PrimaryComponentTick.TickGroup = TG_PostUpdateWork;
+					//HealthWidget->PrimaryComponentTick.TickGroup = TG_PostUpdateWork;
 				}
 			}
 			else

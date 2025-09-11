@@ -13,8 +13,9 @@
 #include "Components/WidgetComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "WASDL/Widgets/EnemyHealthWidget.h"
-
+#include "WASDL/Actor/CommandCenter.h"
 #include "EngineUtils.h" // TactorIterator
+#include "Kismet/GameplayStatics.h"
 // Sets default values
 ABaseCharacter::ABaseCharacter()
 {
@@ -75,6 +76,17 @@ void ABaseCharacter::BeginPlay()
 			GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Red, TEXT("[Enemy] Widget is null"));
 		}
 	}
+
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("CommandCenter"), CommandCenter);
+	
+	if (CommandCenter.Num() != 0)
+	{
+		CommandCenterInstance = Cast<ACommandCenter>(CommandCenter.IsValidIndex(0) ? CommandCenter[0] : nullptr);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Red, TEXT("Fail Get CommandCenter"));
+	}
 	
 }
 
@@ -134,14 +146,14 @@ void ABaseCharacter::Tick(float DeltaTime)
 float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
-	const float Applied = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (!HasAuthority() || HealthComponent->bIsDead) return 0.0f;
 	
 	const float OldHP = HealthComponent->CurrentHP;
-	
-	const float CurHP = FMath::Clamp(OldHP - FMath::Max(0.f, DamageAmount),
+	const float CurHP = FMath::Clamp(OldHP - DamageAmount,//FMath::Max(0.f, DamageAmount),
 							 0.f,
 							 HealthComponent->MaxHP);
+
+	HealthComponent->CurrentHP = CurHP;
 	HealthComponent->UpdateWidget_Server(CurHP);
 	//HealthComponent->ApplyDamage_Server(DamageAmount);
 	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, FString::Printf(TEXT(" %s:CurrentHP : %f"),*GetName() ,HealthComponent->CurrentHP));
@@ -150,10 +162,11 @@ float ABaseCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 	{
 		HealthComponent->bIsDead = true;
 		HandleDeath(); // 서버에서만 실행되게
-		//MultiCast_OnDeath(); // FX 애니메이션 브로드캐스트
 	}
-	return OldHP - HealthComponent->CurrentHP;
+	
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
+
 
 void ABaseCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -166,23 +179,19 @@ AActor* ABaseCharacter::GetTarget()
 {
 	if (TargetTag == "")
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red,TEXT("[BaseCharacter] Not Set TargetTag, FindRadius"));
+		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Magenta,TEXT("[BaseCharacter] Not Set TargetTag, FindRadius"));
 		return this;
 	}
-	AActor* NextTarget = FindNearestEnemy_Registry(TargetTag, FindRadius);
-	if (NextTarget)
-	{
-		return NextTarget;
-	}
-	else
-	{
-		return this;
-	}
+	if (AActor* next = FindNearestTarget_Registry(TargetTag, FindRadius)) return next;
+	return CommandCenterInstance;
 }
 
 bool ABaseCharacter::GetIsTargetNear()
 {
 	CurrentTarget = TraceArond(FindRadius);
+
+	if (HealthComponent && HealthComponent->IsDead())
+		return false;
 	
 	if (CurrentTarget)
 	{
@@ -244,7 +253,7 @@ AActor* ABaseCharacter::TraceArond(float _radius)
 	return nullptr;
 }
 
-AActor* ABaseCharacter::FindNearestEnemy_Registry(FName _tag, float MaxRadius)
+AActor* ABaseCharacter::FindNearestTarget_Registry(FName _tag, float MaxRadius)
 {
 	float ClosestDist = MaxRadius; // FLT_MAX
 	AActor* Closest = nullptr;
@@ -273,7 +282,7 @@ void ABaseCharacter::Multicast_OnDeath_Implementation()
 
 void ABaseCharacter::Server_OnDeath_Implementation()
 {
-	
+	//Multicast_OnDeath();
 }
 
 void ABaseCharacter::HandleDeath()

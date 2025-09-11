@@ -50,10 +50,12 @@ public:
 	UFUNCTION(NetMulticast,Unreliable,BlueprintCallable)
 	void TankOnTarget();
 
+
+	UFUNCTION()
+	void SetOrderLocation(const FVector& location);
 	
-	void SetOrderLocation(const FVector& location) {OrderLocation = location;}
 	UFUNCTION(BlueprintCallable)
-	FVector GetOrderLocation()const {return OrderLocation;}
+	const FVector& GetOrderLocation()const {return OrderLocation;}
 
 
 	UPROPERTY(EditAnywhere)

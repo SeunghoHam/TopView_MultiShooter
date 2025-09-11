@@ -1,0 +1,27 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\teamgamestate.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\x64\\wasdleditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\wasdl\\definitions.wasdl.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\source\\wasdl\\system\\teamgamestate.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\gamestate.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\gamestatebase.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\gamemodebase.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\engine\\serverstatreplicator.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\serverstatreplicator.generated.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\gamemodebase.generated.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\gamestatebase.generated.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\gamestate.generated.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\source\\wasdl\\system\\teamplayerstate.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\playerstate.h",
+            "c:\\program files\\epic games\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\playerstate.generated.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\teamplayerstate.generated.h",
+            "c:\\unrealengineproject\\project_tsc\\wasdl\\intermediate\\build\\win64\\unrealeditor\\inc\\wasdl\\uht\\teamgamestate.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

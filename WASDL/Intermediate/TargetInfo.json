@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "WASDL",
+			"Path": "..\\Source\\WASDL.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "WASDLEditor",
+			"Path": "..\\Source\\WASDLEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

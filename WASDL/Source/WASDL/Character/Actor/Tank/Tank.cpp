@@ -127,6 +127,11 @@ void ATank::TryRegister()
 	RegisterRevealer(0);
 }
 
+void ATank::SetOrderLocation(const FVector& location)
+{
+	OrderLocation = location;
+}
+
 void ATank::TankOnTarget_Implementation()
 {
 	//  화구 돌리기

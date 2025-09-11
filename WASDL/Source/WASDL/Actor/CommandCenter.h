@@ -32,7 +32,9 @@ public:
 	UFUNCTION()
 	void OnRep_Health();
 
-
+	UPROPERTY(EditAnywhere)
+	USceneComponent* SC;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UStaticMeshComponent* SpawnPoint;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

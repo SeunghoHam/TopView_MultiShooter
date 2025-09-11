@@ -1,0 +1,31 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/StarterContent/Architecture/Floor_400x400.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Enemy/BP_BaseEnemy.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Battle.umap",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Object/BP_CommandCenter.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Object/AI/BT_Tank.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Object/AI/Task/BTT_TankActive.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Object/AI/Task/BTT_TankSetOrderLocation.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Enemy/AI/Task/BTT_UpdateTarget.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Enemy/AI/BT_Zuggling.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Enemy/AI/Task/BTT_CheckAround.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Object/AI/AIC_Tank.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Map.umap",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Enemy/ABP_Enemy.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/Actor/Object/BP_Tank.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/ParagonIggyScorch/Characters/Heroes/IggyScorch/Skins/Fireball/Meshes/IggyScorch_Fireball.uasset",
+				"C:/Program Files/Epic Games/UE_5.4/Engine/Plugins/Enterprise/DatasmithContent/Content/Materials/FBXImporter/VREDReference.uasset",
+				"C:/Program Files/Epic Games/UE_5.4/Engine/Content/EngineMaterials/VolumeTextureThumbnailMaterial.uasset",
+				"C:/Program Files/Epic Games/UE_5.4/Engine/Plugins/Enterprise/DatasmithContent/Content/Materials/CE_OpaqueReference.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/ModularGothicFantasyEnvironment/Blueprints/BP_PostLantern.uasset",
+				"C:/UnrealEngineProject/Project_TSC/WASDL/Content/ModularGothicFantasyEnvironment/Maps/Battle.umap"
+			]
+		}
+	]
+}

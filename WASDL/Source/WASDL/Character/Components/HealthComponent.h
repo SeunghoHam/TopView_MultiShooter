@@ -34,7 +34,10 @@ public:
 	bool bIsDead = false;
 
 
-	UPROPERTY(EditAnywhere, Transient) UProgressBar* HPBarWidgetInstance = nullptr; // Transient 권장
+	//UPROPERTY(EditAnywhere, Transient)
+	// 캐릭터에서 할당할거임
+	UPROPERTY()
+	UProgressBar* HPBarWidgetInstance = nullptr; // Transient 권장
 
 	void SetHealthBarHandle(FColor _color);
 	

@@ -15,11 +15,14 @@ ACommandCenter::ACommandCenter()
 	//SetReplicates(true);
 	SetCanBeDamaged(true);
 
+	SC =  CreateDefaultSubobject<USceneComponent>(TEXT("SC"));
+	RootComponent = SC;
+	
 	CenterMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CommandCenterMesh"));
-	RootComponent = CenterMesh;
+	CenterMesh->SetupAttachment(SC);
 	
 	SpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SpawnPoint"));
-	SpawnPoint->SetupAttachment(RootComponent);
+	SpawnPoint->SetupAttachment(SC);
 
 	
 	//SpawnPoint->SetCollisionEnabled();
@@ -94,7 +97,11 @@ void ACommandCenter::MultiCast_SpawnTank_Implementation(const FVector_NetQuantiz
 			//FActorSpawnParameters params;
 			ATank* tank = GetWorld()->SpawnActor<ATank>(TankClass, SpawnPoint->GetComponentLocation(),
 														SpawnPoint->GetComponentRotation());
-			tank->SetOrderLocation(_spawnPoint);
+			if (tank)
+			{
+				//GEngine->AddOnScreenDebugMessage()
+				tank->SetOrderLocation(_spawnPoint);
+			}
 		}	
 		else
 		{

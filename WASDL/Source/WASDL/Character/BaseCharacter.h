@@ -13,6 +13,7 @@ class UHealthComponent;
 class USoundComponent;
 class UEnemyHealthWidget;
 class UWidgetComponent;
+class ACommandCenter;
 struct FTimerHandle;
 
 UCLASS()
@@ -54,7 +55,7 @@ public:
 	AActor* GetTarget();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	bool GetIsTargetNear(); // CurrentTarget 여기서 결정됨
+	virtual bool GetIsTargetNear(); // CurrentTarget 여기서 결정됨
 
 	
 	
@@ -64,6 +65,11 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_AttackRotation) // Replicated
 	FQuat AttackRotation;
 
+	UPROPERTY()
+	TArray<AActor*> CommandCenter;
+	
+	UPROPERTY()
+	ACommandCenter* CommandCenterInstance;
 
 	UFUNCTION()
 	virtual void OnRep_AttackRotation();
@@ -71,11 +77,12 @@ public:
 	FName TargetTag = "";
 	float FindRadius = 0.f; // 적 공격 전 탐색용. 다음 적 탐색은 FLT_MAX 범위로 검사함
 
-
-	
+	UFUNCTION()
+	virtual void CheckCurrentHP() {};
+	float GetDamage = 0.f;
 	FVector TraceRange = FVector(50.f, 50.f, 25.f);
 	AActor* TraceArond(float _radius); // 공격범위 내부에 공격할 적 찾기
-	AActor* FindNearestEnemy_Registry(FName _tag ,float MaxRadius); // MoveTo까지의 적 찾기
+	AActor* FindNearestTarget_Registry(FName _tag ,float MaxRadius); // MoveTo까지의 적 찾기
 
 	UFUNCTION(NetMulticast,Reliable)
 	virtual void Multicast_OnDeath();
@@ -85,4 +92,5 @@ public:
 	virtual void TryRegister();
 	void RegisterRevealer(int _TeamNumber);
 	FTimerHandle RegisterDelayHandle;
+	//TObjectPtr<ACommandCenter> CommandCenterInst;
 };
