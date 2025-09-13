@@ -36,8 +36,8 @@ void AUzuhaController::OnPossess(APawn* InPawn)
 	Uzuha = Cast<AUzuha>(InPawn);
 	if (Uzuha) Uzuha->SetController(this); // 서버 클라이언트 부착
 	if (!GetWorld()) return;
-	GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Yellow,
-		FString::Printf(TEXT("%s Possess : PawnName  : %s"),*this->GetName(),* InPawn->GetName()));
+	//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Yellow,
+	//	FString::Printf(TEXT("%s Possess : PawnName  : %s"),*this->GetName(),* InPawn->GetName()));
 	/*
 	if (InPawn)
 	{

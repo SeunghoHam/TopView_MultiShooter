@@ -180,10 +180,11 @@ AActor* ABaseCharacter::GetTarget()
 {
 	if (TargetTag == "")
 	{
-		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Magenta,TEXT("[BaseCharacter] Not Set TargetTag, FindRadius"));
+		//GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Magenta,TEXT("[BaseCharacter] Not Set TargetTag, FindRadius"));
 		return this;
 	}
-	if (AActor* next = FindNearestTarget_Registry(TargetTag, FindRadius)) return next;
+	// 최대값으로 반환시켜야 멍때리는거 없어짐
+	if (AActor* next = FindNearestTarget_Registry(TargetTag, FLT_MAX)) return next;
 	return CommandCenterInstance;
 }
 
@@ -229,6 +230,7 @@ AActor* ABaseCharacter::TraceArond(float _radius)
 		Rot,
 		ECC_Visibility,
 		BoxShape, param);
+	/*
 	DrawDebugBox(
 		GetWorld(),
 		GetActorLocation(),
@@ -237,7 +239,7 @@ AActor* ABaseCharacter::TraceArond(float _radius)
 		FColor::Blue,
 		false,
 		0.5f);
-	
+	*/
 	UE_LOG(LogTemp, Warning, TEXT("TargetTag : %s"),*TargetTag.ToString());
 	
 	if (bHit)
@@ -265,7 +267,7 @@ AActor* ABaseCharacter::FindNearestTarget_Registry(FName _tag, float MaxRadius)
 		{
 			float Dist = FVector::Dist(GetActorLocation(), It->GetActorLocation());
 			UE_LOG(LogTemp, Warning, TEXT("FindTarget Dist : %f"), Dist);
-			DrawDebugLine(GetWorld(), GetActorLocation(), It->GetActorLocation(), FColor::Blue, false, 1.0f);
+			//DrawDebugLine(GetWorld(), GetActorLocation(), It->GetActorLocation(), FColor::Blue, false, 1.0f);
 			if (Dist < ClosestDist)
 			{
 				Closest = *It;
@@ -276,14 +278,11 @@ AActor* ABaseCharacter::FindNearestTarget_Registry(FName _tag, float MaxRadius)
 	return Closest;
 }
 
-void ABaseCharacter::Multicast_OnDeath_Implementation()
-{
-	
-}
+void ABaseCharacter::Multicast_OnDeath_Implementation(){}
 
 void ABaseCharacter::Server_OnDeath_Implementation()
 {
-	//Multicast_OnDeath();
+	Multicast_OnDeath();
 }
 
 void ABaseCharacter::HandleDeath()
@@ -291,7 +290,7 @@ void ABaseCharacter::HandleDeath()
 	if (auto* FOW = GetWorld()->GetSubsystem<UFogOfWarSubsystem>())
 	{
 		if (VisibilityComponent) FOW->UnregisterRevealer(VisionRevealerComponent);
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("virtual Destory Success"));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("virtual Destory Success"));
 	}
 }
 
@@ -306,8 +305,8 @@ void ABaseCharacter::ObjectRegisterRevealer(int _TeamNumber)
 			VisionRevealerComponent->SetCurrentTeam(TeamID);
 			FOW->RegisterRevealer(VisionRevealerComponent, VisionRevealerComponent->GetScaledSphereRadius(), TeamID);
 			UE_LOG(LogTemp, Warning, TEXT("Register [%d]"), TeamID);
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta,
-				FString::Printf(TEXT("Enemy Register: %s. Team : %d"), *GetName(), VisionRevealerComponent->GetCurrentTeam()));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta,
+			//	FString::Printf(TEXT("Enemy Register: %s. Team : %d"), *GetName(), VisionRevealerComponent->GetCurrentTeam()));
 		}
 	}
 	else

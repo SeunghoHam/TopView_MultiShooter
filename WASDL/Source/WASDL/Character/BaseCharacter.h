@@ -86,6 +86,8 @@ public:
 
 	UFUNCTION(NetMulticast,Reliable)
 	virtual void Multicast_OnDeath();
+	
+		
 	UFUNCTION(Server,Reliable)
 	virtual void Server_OnDeath();
 	virtual void HandleDeath();

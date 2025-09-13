@@ -19,7 +19,7 @@ void ATeamPlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 
 void ATeamPlayerState::SetHealth(float current,float max)
 {
-	if (MaxHealth ==0 ) MaxHealth = max;
+	if (MaxHealth ==0) MaxHealth = max;
 	if (HasAuthority()) // 체력 변경은 서버 권한에서만
 	{
 		//const float Old = Health;

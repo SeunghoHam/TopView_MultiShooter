@@ -19,8 +19,6 @@ UVisionRevealerComponent::UVisionRevealerComponent()
 	bHiddenInGame = false; // 컴포넌트 자체는 숨김X
 	PrimaryComponentTick.bCanEverTick = false;
 	InitSphereRadius(VisionRadius);
-
-	//SetSphereRadius(SphereRadius, true);
 }
 
 void UVisionRevealerComponent::BeginPlay()
@@ -41,7 +39,7 @@ void UVisionRevealerComponent::GetLifetimeReplicatedProps(TArray<class FLifetime
 void UVisionRevealerComponent::OnRep_CurrentTeam()
 {
 	// 팀 변경시 해야할 처리
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White,TEXT("Onrep_currentTime"));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White,TEXT("Onrep_currentTime"));
 	if (UWorld* W = GetWorld())
 		if (auto* FOW = W->GetSubsystem<UFogOfWarSubsystem>())
 		{
@@ -71,11 +69,9 @@ void UVisionRevealerComponent::OnEnter(UPrimitiveComponent* _pri, AActor* Other,
 	if (!IsEnemy(Other)) return;
 	int32& Count = VisibleCount.FindOrAdd(Other);
 	++Count;
-
 	// 가시 토글은 UFogVisibilityComponent(복제)로만 처리
 	// 보이냐 안보이냐 확인은 FOW Manager에서 확인할거
 	//가시/숨김은 서버 Subsystem + UFogVisibilityComponent 복제로만 처리하게 단일화!
-	//Other->SetActorHiddenInGame(false);
 }
 
 void UVisionRevealerComponent::OnExit(UPrimitiveComponent* _pri, AActor* Other, UPrimitiveComponent* _pri2, int32 _int)
@@ -87,8 +83,6 @@ void UVisionRevealerComponent::OnExit(UPrimitiveComponent* _pri, AActor* Other, 
 		if (*Count == 0)
 		{
 			VisibleCount.Remove(Other);
-			// 여기서도 직접 토글하지 않음
-			//Other->SetActorHiddenInGame(true);
 		}
 	}
 }

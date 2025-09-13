@@ -23,9 +23,7 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 	// ...
-	
 }
 
 
@@ -85,7 +83,7 @@ void UHealthComponent::UpdateWidget_Server_Implementation(float CurHP)
 
 void UHealthComponent::UpdateHealthUI()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White,TEXT("Update HP Widget"));
+	///GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::White,TEXT("Update HP Widget"));
 	const float Cur= FMath::Clamp(CurrentHP, 0.f, MaxHP);
 	if (HPBarWidgetInstance) HPBarWidgetInstance->SetPercent(Cur/ MaxHP); // 서버 업데이트
 }

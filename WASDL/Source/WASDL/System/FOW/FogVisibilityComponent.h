@@ -33,8 +33,8 @@ public:
 	UPROPERTY(ReplicatedUsing=OnRep_Vis)
 	TArray<bool> bVisibleForTeam;
 		// 최대 8팀까지 지원 (각 비트 = 팀 가시 여부)
-	   UPROPERTY(ReplicatedUsing=OnRep_Vis)
-	   uint8 VisibleMask = 0;
+	UPROPERTY(ReplicatedUsing=OnRep_Vis)
+	uint8 VisibleMask = 0;
 	
 	UFUNCTION()
 	void OnRep_Vis();

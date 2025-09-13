@@ -112,7 +112,7 @@ int32 UFogVisibilityComponent::GetLocalTeamId(const UObject* WorldContext)
 	// 최소 예시:
 	if (!WorldContext || !WorldContext->GetWorld())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Red,TEXT("[FOGVisibilityComponent] GetLocalID : object"));
+		//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Red,TEXT("[FOGVisibilityComponent] GetLocalID : object"));
 		return G_LastLocalTeam;
 	}
 	const UWorld* W = WorldContext->GetWorld();
@@ -134,8 +134,7 @@ int32 UFogVisibilityComponent::GetLocalTeamId(const UObject* WorldContext)
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Red,TEXT("[FOGVisibilitycomponent] GetLocalID : Controlller"));
-		
+		//GEngine->AddOnScreenDebugMessage(-1, 4.0f, FColor::Red,TEXT("[FOGVisibilitycomponent] GetLocalID : Controlller"));
 	}
 	/*
 	if (auto* VR =  GetOwner()->FindComponentByClass<UVisionRevealerComponent>())

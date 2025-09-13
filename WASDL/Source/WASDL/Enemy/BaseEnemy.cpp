@@ -28,7 +28,7 @@ ABaseEnemy::ABaseEnemy()
 	//bOnlyRelevantToOwner= false;
 	//bNetUseOwnerRelevancy =false;
 	//SetCanBeDamaged(true);
-	
+	//SM = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SM"));
 	AnimationComponent = CreateDefaultSubobject<UAnimationControlComponent>(TEXT("AnimationComponent"));
 
 }
@@ -88,8 +88,9 @@ void ABaseEnemy::BeginPlay()
 void ABaseEnemy::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ABaseEnemy, Acurrent);
-	DOREPLIFETIME(ABaseEnemy, ARcurrent);
+	//DOREPLIFETIME(ABaseEnemy, Acurrent);
+	//DOREPLIFETIME(ABaseEnemy, ARcurrent);
+	DOREPLIFETIME(ABaseEnemy, bIsEnemyDead);
 }
 
 // Called every frame
@@ -102,7 +103,7 @@ void ABaseEnemy::Tick(float DeltaTime)
 		AttackDir = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 		
 	}
-	
+	/*
 	if (bAttacking)
 	{
 		if (bAttackPart) // 공격 (앞으로 이동 및 회전)
@@ -131,13 +132,22 @@ void ABaseEnemy::Tick(float DeltaTime)
 		//SetActorRotation(ARcurrent);
 		SetActorRelativeRotation(ARcurrent);
 	}
-	
+	*/
 	// 1) 위치 업데이트
 	const FVector WidgetLoc = GetActorLocation() + FVector(0.f, 0.f, 150.f);
 	HealthWidget->SetWorldLocation(WidgetLoc);
 	FRotator rot = FRotator(180.f, 0.f, 0.f);
 	HealthWidget->SetWorldRotation(rot.Quaternion());
 }
+
+void ABaseEnemy::OnRep_EnemyDeath()
+{
+		if (bIsEnemyDead && AnimInstance)
+		{
+			AnimInstance->SetAnimType(EAnimType::Death); // 모든 클라에서 동일하게 상태 진입
+		}
+}
+
 void ABaseEnemy::TaskAttackEnd()
 {
 	AnimInstance->SetAnimType(EAnimType::Idle);
@@ -146,7 +156,21 @@ void ABaseEnemy::TaskAttackEnd()
 void ABaseEnemy::HandleDeath()
 {
 	Super::HandleDeath();
-	
+
+	if (HasAuthority())
+	{
+		if (!bIsEnemyDead)  // 중복 방지
+		{
+			bIsEnemyDead = true;         // ✔ 상태 복제 → OnRep_DeathState로 애니 동기화
+			Multicast_OnDeath();    // ✔ 사운드/충돌/수명 등 연출만
+		}
+	}
+	else
+	{
+		Server_OnDeath(); // 안전망
+	}
+
+	/*
 	if (HasAuthority())
 	{
 		Multicast_OnDeath();
@@ -155,6 +179,7 @@ void ABaseEnemy::HandleDeath()
 	{
 		Server_OnDeath();
 	}
+	*/
 	// 서버 전용의 사망 처리.
 	/*
 	if (auto* FOW = GetWorld()->GetSubsystem<UFogOfWarSubsystem>())
@@ -178,7 +203,8 @@ void ABaseEnemy::HandleDeath()
 
 void ABaseEnemy::Server_OnDeath()
 {
-	Super::Server_OnDeath();
+	//Super::Server_OnDeath();
+	ABaseEnemy::Multicast_OnDeath();
 }
 
 void ABaseEnemy::Multicast_OnDeath()
@@ -216,15 +242,7 @@ bool ABaseEnemy::IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTa
 
 FVector ABaseEnemy::GetTargetLocation()
 {
-	/*
-	if (!CommandCenterInstance) 
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red,TEXT("TargetLocation is Zero"));
-		return FindNearestTarget_Registry(TargetTag, FLT_MAX)->GetActorLocation();
-	}*/
-	//GEngine->AddOnScreenDebugMessage(-1, 1.0f,FColor::Yellow,
-	//	FString::Printf(TEXT("CommandCenter : %s"), *CommandCenterInstance->GetName()));
-	//AnimInstance->SetAnimType(EAnimType::Walk);
+
 	AActor* NextTarget = FindNearestTarget_Registry(TargetTag,FLT_MAX);
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f,FColor::Yellow,
@@ -279,12 +297,13 @@ void ABaseEnemy::TryAttack()
 			if (!WeakThis.IsValid()) return;
 			if (!HealthComponent->IsDead()) AnimInstance->SetAnimType(EAnimType::Idle);
 		}, 0.3f, false);
-	
+
+		/*
 		DrawDebugLine(GetWorld(),
 			GetActorLocation(),
 			CurrentTarget->GetActorLocation(),
 			FColor::Yellow, false, 1.0f);
-
+		*/
 		// Authority만 진행됨
 		
 		if (HasAuthority()) // 데미지 계산은 서버에서만
@@ -296,10 +315,10 @@ void ABaseEnemy::TryAttack()
 			//AttackRotation = newRot.Quaternion();
 			//SetActorRotation(quat);
 
-			
 			AttackPreset();
 			UE_LOG(LogTemp, Log, TEXT("Target : %s"), *CurrentTarget->GetName());
 			Multicast_AttackMotionEffect(GetActorLocation());
+			
 			UGameplayStatics::ApplyDamage(
 				CurrentTarget,
 				10.f,

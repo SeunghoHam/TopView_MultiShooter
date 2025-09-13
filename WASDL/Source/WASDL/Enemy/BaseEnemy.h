@@ -14,7 +14,7 @@ class UAnimationControlComponent;
 class ACommandCenter;
 class UEnemyAnimInstance;
 class UHealthComponent;
-
+class USkeletalMeshComponent;
 //class UAnimMontage;
 struct FTimerHandle;
 UCLASS()
@@ -30,12 +30,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	// virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-	//virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	// Called every frame
 
 	virtual void Tick(float DeltaTime) override;
 public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, meta=(AllowPrivateAccess))
+	USkeletalMeshComponent* SM;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, meta=(AllowPrivateAccess))
 	UAnimationControlComponent* AnimationComponent;
@@ -110,7 +109,11 @@ public:
 	//UPROPERTY(ReplicatedUsing=OnRep_Health, VisibleInstanceOnly, Category="HP")
 	//float CurrentHP;
 	//UPROPERTY(Replicated, VisibleInstanceOnly, Category="HP")
-	//bool bIsDead = false;
+	UPROPERTY(ReplicatedUsing=OnRep_EnemyDeath)
+	bool bIsEnemyDead = false;
+
+	UFUNCTION()
+	void OnRep_EnemyDeath();
 	
 	//UFUNCTION()
 	//void OnRep_Health();

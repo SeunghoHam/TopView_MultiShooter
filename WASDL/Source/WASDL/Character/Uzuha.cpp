@@ -136,8 +136,13 @@ void AUzuha::BeginPlay()
 	Super::BeginPlay();
 	SetAttackModeLook(false);
 	AnimInstance = Cast<UUzuhaAnimInstance>(GetMesh()->GetAnimInstance());
-	HealthComponent->HealthInitialize(120.0f);
 
+	if (HealthComponent)
+	{
+		HealthComponent->HealthInitialize(120.0f);
+		//HealthComponent->
+	}
+	
 	
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("CommandCenter"), CommandCenter);
 	if (CommandCenter.Num() != 0)
@@ -164,7 +169,7 @@ void AUzuha::BeginPlay()
 void AUzuha::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AUzuha, ReplicatedAimYaw);
+	DOREPLIFETIME_CONDITION(AUzuha, ReplicatedAimYaw,COND_SkipOwner); // 소유자에게 불필요한 복제 차단함
 	//DOREPLIFETIME(AUzuha, CurrentHP);
 	//DOREPLIFETIME(AUzuha, bIsDead);
 }
@@ -172,7 +177,8 @@ void AUzuha::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLife
 float AUzuha::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	if (!HasAuthority() || HealthComponent->bIsDead) return 0.0f;
+	if (//!HasAuthority() ||
+		HealthComponent->bIsDead) return 0.0f;
 	
 	const float OldHP = HealthComponent->CurrentHP;
 
@@ -180,14 +186,23 @@ float AUzuha::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 							 0.f,
 							 HealthComponent->MaxHP);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("GetDamaged : %f"), HealthComponent->CurrentHP));
 
+	if (GetNetMode() == NM_ListenServer)
+	{
+		HealthComponent->OnRep_CurrentHP();
+	}
+	
+	//HealthComponent->UpdateHealthUI();
+	
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Magenta, FString::Printf(TEXT("GetDamaged : %f"), HealthComponent->CurrentHP));
+	/*
 	ATeamPlayerState* PS = GetPlayerState<ATeamPlayerState>();
 	if (PS)
 	{
 		const float NewHP = FMath::Clamp(PS->GetHealth() - DamageAmount, 0.f, 100.f);
 		PS->SetHealth(NewHP, HealthComponent->MaxHP); // → 모든 클라 UI가 OnRep로 갱신됨
 	}
+	*/
 	
 	if (HealthComponent->CurrentHP <= 0 && !HealthComponent->bIsDead)
 	{
@@ -195,6 +210,7 @@ float AUzuha::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEv
 		HandleDeath(); // 서버에서만 실행되게
 		//MultiCast_OnDeath(); // FX 애니메이션 브로드캐스트
 	}
+	
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
@@ -202,8 +218,8 @@ void AUzuha::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	PC = Cast<AUzuhaController>(NewController);   // ✅ 서버에서 즉시 연결
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,
-	FString::Printf(TEXT("%s Controller  : %s"), *this->GetName(), *PC->GetName()));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green,
+	//FString::Printf(TEXT("%s Controller  : %s"), *this->GetName(), *PC->GetName()));
 	EnsureLocalUI();      // 로컬이면 UI 보장
 }
 
@@ -298,7 +314,7 @@ void AUzuha::Tick(float DeltaTime)
 
 void AUzuha::SetController(AUzuhaController* _Ctr)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White, TEXT("SetCtr"));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White, TEXT("SetCtr"));
 	PC = _Ctr; // 저장
 	EnsureLocalUI(); // 로컬상태라면 UI 보장
 }
@@ -373,6 +389,7 @@ void AUzuha::ServerSetAimYaw_Implementation(float NewYaw)
 
 void AUzuha::Server_TryAttack_Implementation(const FVector_NetQuantizeNormal& ShootDir)
 {
+	Multicast_OnHitFX(); // 이펙트 브로드캐스트
 	DoAttackTrace_Server(ShootDir);
 }
 
@@ -380,6 +397,7 @@ void AUzuha::DoAttackTrace_Server(const FVector& ShootDir)
 {
 	//auto* PC = Cast<AUzuhaController>(GetController());
 	if (!PC) return;
+	
 	// 보안/치트 방지: 서버 기준 위치/방향 사용
 	CurrentTarget = FindNearestEnemy_Registry(900.0f); // 시야 범위랑 맞춰줘야댐
 	if (!CurrentTarget) return;
@@ -398,6 +416,7 @@ void AUzuha::DoAttackTrace_Server(const FVector& ShootDir)
 			UDamageType::StaticClass()
 			);
 }
+
 
 void AUzuha::SpawnPing()//FVector Location)
 {
@@ -497,7 +516,7 @@ void AUzuha::Multicast_DebugLine_Implementation(FVector_NetQuantize Start, FVect
                                                 float LifeTime, float Thickness)
 {
 	if (GetNetMode() == NM_DedicatedServer) return;
-	DrawDebugLine(GetWorld(), Start, End, Color, /*bPersistentLines=*/false, LifeTime, /*DepthPriority=*/0, Thickness);
+	//DrawDebugLine(GetWorld(), Start, End, Color, /*bPersistentLines=*/false, LifeTime, /*DepthPriority=*/0, Thickness);
 }
 
 
@@ -529,9 +548,10 @@ void AUzuha::LM_Press()
 		
 		GetMouseGroundLocation(); // 1
 		//CheckFrontDistance(); // 2
-		Multicast_OnHitFX(); // 이펙트 브로드캐스트
+		
 		if (HasAuthority())
 		{
+			Multicast_OnHitFX(); // 이펙트 브로드캐스트
 			DoAttackTrace_Server(Direction); // 리슨서버 호스트의 로컬공격
 		}
 		else
@@ -554,7 +574,7 @@ void AUzuha::LM_Press()
 			const FVector End = Start + MouseWorldDir * 2000; // 커서 방향으로 충분히 멀리
 
 			const bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
-			DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.5f);
+			//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.5f);
 
 			if (bHit)
 			{
@@ -774,7 +794,7 @@ AActor* AUzuha::FindNearestEnemy_Registry(float MaxRadius)
 		if (It->ActorHasTag("Enemy"))
 		{
 			float Dist = FVector::Dist(GetActorLocation(), It->GetActorLocation());
-			DrawDebugLine(GetWorld(), GetActorLocation(), It->GetActorLocation(), FColor::Blue, false, 1.0f);
+			//DrawDebugLine(GetWorld(), GetActorLocation(), It->GetActorLocation(), FColor::Blue, false, 1.0f);
 			if (Dist < ClosestDist)
 			{
 				Closest = *It;
@@ -817,7 +837,7 @@ void AUzuha::CheckFrontDistance()
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red,TEXT("No Hit"));
 		//CameraPoint = EndPoint;
 	}
-	DrawDebugLine(GetWorld(), GetActorLocation(), EndPoint, FColor::Red, false, 1.0f);
+	//DrawDebugLine(GetWorld(), GetActorLocation(), EndPoint, FColor::Red, false, 1.0f);
 }
 
 void AUzuha::SetNewCameraPivot()

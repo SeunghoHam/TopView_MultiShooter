@@ -109,9 +109,9 @@ void ATank::FindTankParts()
 	Muzzle = FindSceneComponentByName(TEXT("Muzzle"));
 
 
-	if (!Wheel) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,TEXT("[Tank] Wheel Null"));
-	if (!Body) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,TEXT("[Tank] Bdoy Null"));
-	if (!Head) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,TEXT("[Tank] Head Null"));
+	//if (!Wheel) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,TEXT("[Tank] Wheel Null"));
+	//if (!Body) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,TEXT("[Tank] Bdoy Null"));
+	//if (!Head) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red,TEXT("[Tank] Head Null"));
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White,
 		FString::Printf(TEXT("Body : %s, Wheel : %s, Head : %s"),*Body->GetName(), *Wheel->GetName(), *Head->GetName()));
 }
