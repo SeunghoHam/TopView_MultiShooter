@@ -26,7 +26,7 @@ void UFogVisibilityComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UFogVisibilityComponent, VisibleMask);
-	DOREPLIFETIME(UFogVisibilityComponent, bVisibleForTeam);
+	//DOREPLIFETIME(UFogVisibilityComponent, bVisibleForTeam);
 }
 
 
@@ -74,11 +74,29 @@ void UFogVisibilityComponent::OnRep_Vis()
 		//  필요하면 이펙트/소리등 토글
 	}*/
 	// Team 개수 3개 사용하기
-	if (GetOwnerRole() == ROLE_Authority) return; // 서버에서는 시각효과 토글 불필요
+
+	// 리슨 서버 호스트(권위 + 로컬 뷰)는 화면 토글이 필요함
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		if (UWorld* W = GetWorld())
+		{
+			// 전용서버(NM_DedicatedServer)는 화면이 없으니 제외, 리슨서버만 적용
+			if (W->GetNetMode() == NM_ListenServer)
+			{
+				const int32 LocalTeam = GetLocalTeamId(this);
+				const bool bForMe = ((VisibleMask >> LocalTeam) & 1u) != 0;
+				if (AActor* Owner = GetOwner())
+					Owner->SetActorHiddenInGame(!bForMe);
+			}
+		}
+		return; // 권위이면서 리슨서버 처리 후 종료
+	}
+	//if (GetOwnerRole() == ROLE_Authority) return; // 서버에서는 시각효과 토글 불필요
+	// 서버는 이미 반영되어있음
 	const int32 LocalTeam = GetLocalTeamId(this);
 	const bool bForMe = ((VisibleMask >> LocalTeam) & 1u) != 0;
 	if (AActor* Owner = GetOwner())
-		Owner->SetActorHiddenInGame(!bForMe);
+		Owner->SetActorHiddenInGame(!bForMe); // 나에게 안보이도록
 }
 
 bool UFogVisibilityComponent::IsVisibleForTeam(int32 TeamId) const

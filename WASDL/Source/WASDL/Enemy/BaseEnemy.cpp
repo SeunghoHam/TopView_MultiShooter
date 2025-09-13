@@ -38,7 +38,7 @@ void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	HealthComponent->HealthInitialize(20.f);
+	HealthComponent->HealthInitialize(30.f);
 	if (UUserWidget* UW = HealthWidget->GetUserWidgetObject())              // ✅ 인스턴스 얻기
 	{
 		if (UEnemyHealthWidget* EH = Cast<UEnemyHealthWidget>(UW))
@@ -72,8 +72,17 @@ void ABaseEnemy::BeginPlay()
 	
 	AnimInstance = Cast<UEnemyAnimInstance>( GetMesh()->GetAnimInstance());
 	TargetTag = "PlayerTeam";
-	FindRadius = 300.f;
-	GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, this, &ABaseEnemy::TryRegister, 0.3f, false);
+	FindRadius = 600.f;
+
+	TWeakObjectPtr<ABaseEnemy> weak(this);
+	FTimerHandle delay;
+	GetWorld()->GetTimerManager().SetTimer(delay, [weak,this]()
+	{
+		if (!weak.IsValid()) return;
+		ABaseCharacter::ObjectRegisterRevealer(1);
+	},0.3f, false);
+	
+	//GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, this, &ABaseCharacter::RegisterRevealer(1), 0.3f, false);
 }
 
 void ABaseEnemy::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -182,23 +191,16 @@ void ABaseEnemy::Multicast_OnDeath()
 	SetLifeSpan(1.5f);
 	if (AnimInstance) AnimInstance->SetAnimType(EAnimType::Death);
 }
-
-void ABaseEnemy::TryRegister()
-{
-	Super::TryRegister();
-	RegisterRevealer(1);
-}
-
-
 // 클라 네트워크 프로파일러 시야 밖 적 네트워크 업데이트가 사라짐.
 // 시야 바깥서는 스켈레톤 /애니메이션 패킷도 안오게 함
+/*
 bool ABaseEnemy::IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const
 {
 	if (!Super::IsNetRelevantFor(RealViewer, ViewTarget, SrcLocation))
 		return false;
 
 	// RealViewer의 팀 추출(프로젝트 규약에 맞게)
-	const int32 ViewerTeam = /* IGenericTeamAgentInterface 등으로 */ 0;
+	const int32 ViewerTeam = 1; // IGenericTeamAgentInterface 등으로 
 
 	if (const UWorld* W = GetWorld())
 	{
@@ -210,8 +212,7 @@ bool ABaseEnemy::IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTa
 	}
 	return true; // 안전망: FOW 없으면 전송
 }
-
-
+*/
 
 FVector ABaseEnemy::GetTargetLocation()
 {
@@ -420,6 +421,7 @@ AActor* ABaseEnemy::TraceArond(float _radius)
 	return nullptr;
 }
 */
+
 /*
 void ABaseEnemy::TryRegisterRevealer()
 {

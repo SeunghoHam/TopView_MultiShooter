@@ -30,7 +30,6 @@ class WASDL_API UFogOfWarSubsystem : public UWorldSubsystem
 public:
 	void SetManager(AFogOfWarManager* In) {Manager = In;}
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-
 	//virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 	virtual void Deinitialize() override;
 

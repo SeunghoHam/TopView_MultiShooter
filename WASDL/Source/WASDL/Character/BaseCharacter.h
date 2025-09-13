@@ -89,8 +89,8 @@ public:
 	UFUNCTION(Server,Reliable)
 	virtual void Server_OnDeath();
 	virtual void HandleDeath();
-	virtual void TryRegister();
-	void RegisterRevealer(int _TeamNumber);
+	//virtual void TryRegister(){};
+	void ObjectRegisterRevealer(int _TeamNumber);
 	FTimerHandle RegisterDelayHandle;
 	//TObjectPtr<ACommandCenter> CommandCenterInst;
 };

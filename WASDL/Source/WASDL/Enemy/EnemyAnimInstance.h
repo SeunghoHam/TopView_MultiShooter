@@ -12,8 +12,8 @@
 UENUM()
 enum class EAnimType : uint8
 {
-	Walk,
 	Idle,
+	Walk,
 	Attack,
 	Death,
 };
@@ -23,7 +23,7 @@ class WASDL_API UEnemyAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EAnimType AnimType;
+	EAnimType AnimType = EAnimType::Idle;
 
 	UFUNCTION(BlueprintCallable)
 	void SetAnimType(EAnimType _type){ AnimType = _type;}

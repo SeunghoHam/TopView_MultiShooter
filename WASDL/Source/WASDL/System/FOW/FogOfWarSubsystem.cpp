@@ -16,6 +16,7 @@ void UFogOfWarSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	
 	ManagerClass = LoadClass<AFogOfWarManager>(nullptr, TEXT("/Game/Actor/FOW/BP_FOWManager.BP_FOWManager_C"));
 	
+	
 	if (ManagerClass)
 	{
 		FActorSpawnParameters Params;
@@ -25,6 +26,7 @@ void UFogOfWarSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		Manager =
 			GetWorld()->SpawnActor<AFogOfWarManager>(ManagerClass, FTransform::Identity, Params);
 	}
+	
 	
 	if (UWorld* W = GetWorld())
 	{
@@ -39,11 +41,15 @@ void UFogOfWarSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		if (!Manager)
 		{
 			Manager = W->SpawnActor<AFogOfWarManager>();
-			UE_LOG(LogTemp, Warning, TEXT("Create FOW Manager : %s"), *Manager->GetName());
+			UE_LOG(LogTemp, Error, TEXT("Create FOW Manager : %s"), *Manager->GetName());
 			
-		}*/
+		}
+		*/
 		// 10Hz 서버틱
-		if (W->GetNetMode() == NM_ListenServer || W->GetNetMode() == EToolkitMode::Standalone) // 서버에서만 실행
+		
+		if (W->GetNetMode() != NM_Client)
+			//W->GetNetMode() == NM_ListenServer
+			//|| W->GetNetMode() == EToolkitMode::Standalone) // 서버에서만 실행
 		{
 			W->GetTimerManager().SetTimer(TickHandle, [this]() { ServerTick(0.1f); }, 0.1f, true);
 		}
@@ -59,8 +65,9 @@ void UFogOfWarSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UFogOfWarSubsystem::Deinitialize()
 {
-	if (UWorld* W = GetWorld()) { W->GetTimerManager().ClearTimer(TickHandle); }
+	GetWorld()->GetTimerManager().ClearTimer(TickHandle);
 	Manager->Destroy();
+	
 	Super::Deinitialize();
 }
 
@@ -157,11 +164,11 @@ bool UFogOfWarSubsystem::IsLocationVisibleToTeam(const FVector& WorldPos, int32 
 		const float Dist2D = FVector::Dist2D(WorldPos, R.Source->GetComponentLocation());
 		if (Dist2D <= R.Radius)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Location check true"));
+			//UE_LOG(LogTemp, Warning, TEXT("Location check true"));
 			return true;
 		}
 	}
-			UE_LOG(LogTemp, Warning, TEXT("Location check false"));
+			//UE_LOG(LogTemp, Warning, TEXT("Location check false"));
 	
 	return false;
 }
@@ -170,9 +177,10 @@ void UFogOfWarSubsystem::ServerTick(float DeltaSeconds)
 {
 	if (!Manager)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("serverTick Manager null"));
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Red, TEXT("serverTick Manager null"));
 		return;
 	}
+	
 	// 서버에서 적 유닛들을 스캔하여 가시 여부 반영(간단 예시)
 	if (!GetWorld()) return;
 	for (TActorIterator<AActor> It(GetWorld()); It; ++It) // 월드에 있는 모든 Actor를 검사

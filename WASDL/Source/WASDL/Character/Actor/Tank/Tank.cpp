@@ -34,7 +34,15 @@ void ATank::BeginPlay()
 	TargetTag = "Enemy";
 	FindRadius = 1200.f;
 	TraceRange = FVector(FindRadius, FindRadius, 40.f);
-	GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, this, &ATank::TryRegister, 0.3f, false);
+
+
+	TWeakObjectPtr<ATank> Weak(this);
+	GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, [Weak,this]()
+	{
+		if (!Weak.IsValid())return;
+		ABaseCharacter::ObjectRegisterRevealer(0);
+	},0.3f, false);
+		//, this, &ATank::TryRegister, 0.3f, false);
 }
 
 // Called every frame
@@ -121,11 +129,6 @@ USceneComponent* ATank::FindSceneComponentByName(FName Tag) const
 	return nullptr;
 }
 
-void ATank::TryRegister()
-{
-	Super::TryRegister();
-	RegisterRevealer(0);
-}
 
 void ATank::SetOrderLocation(const FVector& location)
 {

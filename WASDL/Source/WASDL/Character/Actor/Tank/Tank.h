@@ -45,7 +45,7 @@ public:
 	UFUNCTION(Netmulticast,Unreliable)
 	void MultiCast_DeathEffectMotion();
 
-	virtual void TryRegister() override;
+	//virtual void TryRegister() override;
 
 	UFUNCTION(NetMulticast,Unreliable,BlueprintCallable)
 	void TankOnTarget();

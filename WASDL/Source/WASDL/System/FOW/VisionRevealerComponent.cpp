@@ -13,19 +13,20 @@ UVisionRevealerComponent::UVisionRevealerComponent()
 
 	SetHiddenInGame(true);
 	SetVisibility(false, true);
-
-	
 	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetCollisionResponseToAllChannels(ECR_Ignore);
 	SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // 임시: Pawn만 감지
 	bHiddenInGame = false; // 컴포넌트 자체는 숨김X
 	PrimaryComponentTick.bCanEverTick = false;
 	InitSphereRadius(VisionRadius);
+
+	//SetSphereRadius(SphereRadius, true);
 }
 
 void UVisionRevealerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("VisionRevealer : %s"), *GetOwner()->GetName());
 	SetSphereRadius(VisionRadius, true);
 	OnComponentBeginOverlap.AddDynamic(this, &UVisionRevealerComponent::OnEnter);
 	OnComponentEndOverlap.AddDynamic(this, &UVisionRevealerComponent::OnExit);

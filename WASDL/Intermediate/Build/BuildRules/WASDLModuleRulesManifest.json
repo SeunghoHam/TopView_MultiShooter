@@ -1,8 +1,0 @@
-{
-	"SourceFiles": [
-		"C:\\UnrealEngineProject\\Project_TSC\\WASDL\\Source\\WASDL\\WASDL.Build.cs",
-		"C:\\UnrealEngineProject\\Project_TSC\\WASDL\\Source\\WASDL.Target.cs",
-		"C:\\UnrealEngineProject\\Project_TSC\\WASDL\\Source\\WASDLEditor.Target.cs"
-	],
-	"EngineVersion": "5.4.4"
-}

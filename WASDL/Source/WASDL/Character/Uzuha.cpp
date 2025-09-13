@@ -136,11 +136,28 @@ void AUzuha::BeginPlay()
 	Super::BeginPlay();
 	SetAttackModeLook(false);
 	AnimInstance = Cast<UUzuhaAnimInstance>(GetMesh()->GetAnimInstance());
-	
+	HealthComponent->HealthInitialize(120.0f);
 
 	
-	HealthComponent->HealthInitialize(120.0f);
-	GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, this, &AUzuha::RegisterRevealer, 0.3, false);
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("CommandCenter"), CommandCenter);
+	if (CommandCenter.Num() != 0)
+	{
+		CommandCenterInstance = Cast<ACommandCenter>(CommandCenter.IsValidIndex(0) ? CommandCenter[0] : nullptr);
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Yellow,
+		//                               FString::Printf(
+		//	                                 TEXT("Get CommandCenter : %s"), *CommandCenterInstance->GetName()));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0F, FColor::Red, TEXT("[Uzuha] CommandCenter"));
+	}
+
+	TWeakObjectPtr<AUzuha> Weak(this);
+	GetWorld()->GetTimerManager().SetTimer(RegisterDelayHandle, [Weak,this]()
+	{
+		if (!Weak.IsValid())return;
+		RegisterRevealer();
+	}, 0.3,false);
 	//GetWorld()->GetTimerManager().SetTimer(ListWidgetTimer, this, &AUzuha::ListWidgetInit, 1.0f, false);
 }
 
@@ -202,7 +219,7 @@ void AUzuha::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	UpdateAimRotation(); // 매 프레임 커서 방향으로 회전
-
+	VisionRevealerComponent->SetWorldLocation(GetActorLocation());
 	auto* Move = GetCharacterMovement();
 	const float V = Move->Velocity.Size();
 	const float A = Move->GetCurrentAcceleration().Size();
@@ -426,6 +443,11 @@ void AUzuha::Multicsat_SpawnTank_Implementation()//FVector_NetQuantize Location)
 	if (CommandCenterInstance)
 	{
 		CommandCenterInstance->MultiCast_SpawnTank(SpawnLocation);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1,2.0f, FColor::Red,
+			TEXT("[Uzuha] CommandCenter is null"));
 	}
 }
 

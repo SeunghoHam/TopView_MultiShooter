@@ -33,6 +33,7 @@ ABaseCharacter::ABaseCharacter()
 	VisibilityComponent = CreateDefaultSubobject<UFogVisibilityComponent>(TEXT("VisibilityComponent"));
 	VisionRevealerComponent = CreateDefaultSubobject<UVisionRevealerComponent>(TEXT("VisionRevealer"));
 	VisionRevealerComponent->SetupAttachment(RootComponent);
+	
 	SoundComponent = CreateDefaultSubobject<USoundComponent>(TEXT("SoundComponent"));
 		
 	HealthWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPWidgetComponent"));
@@ -294,21 +295,18 @@ void ABaseCharacter::HandleDeath()
 	}
 }
 
-void ABaseCharacter::TryRegister()
-{
-	
-}
-
-void ABaseCharacter::RegisterRevealer(int _TeamNumber)
+void ABaseCharacter::ObjectRegisterRevealer(int _TeamNumber)
 {
 	if (auto* FOW = GetWorld()->GetSubsystem<UFogOfWarSubsystem>())
 	{
 		if (VisionRevealerComponent)
 		{
+			
 			int32 TeamID = _TeamNumber;
 			VisionRevealerComponent->SetCurrentTeam(TeamID);
 			FOW->RegisterRevealer(VisionRevealerComponent, VisionRevealerComponent->GetScaledSphereRadius(), TeamID);
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Magenta,
+			UE_LOG(LogTemp, Warning, TEXT("Register [%d]"), TeamID);
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta,
 				FString::Printf(TEXT("Enemy Register: %s. Team : %d"), *GetName(), VisionRevealerComponent->GetCurrentTeam()));
 		}
 	}

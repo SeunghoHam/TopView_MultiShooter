@@ -40,7 +40,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, meta=(AllowPrivateAccess))
 	UAnimationControlComponent* AnimationComponent;
 
-	virtual bool IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const override;
+	//virtual bool IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const override;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UEnemyAnimInstance* AnimInstance = nullptr;
@@ -128,7 +128,7 @@ public:
 	virtual void Multicast_OnDeath() override;
 	
 
-	virtual void TryRegister() override;
+	//virtual void TryRegister() override;
 	//void TryRegisterRevealer();
 	FTimerHandle RegisterDelayHandle;
 };

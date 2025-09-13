@@ -20,7 +20,7 @@ class WASDL_API UVisionRevealerComponent : public USphereComponent
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="FOW")
-	float VisionRadius = 600.f; // 시야 반경(게임 밸런싱 파라미터)
+	float VisionRadius = 1000.f; // 시야 반경(게임 밸런싱 파라미터)
 
 	UFUNCTION(BlueprintCallable, Category="FOW")
 	void SetVisionRadius(float NewRadius);
